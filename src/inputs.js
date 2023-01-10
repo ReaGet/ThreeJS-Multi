@@ -59,19 +59,32 @@ export default class InputUI {
         this.selected.rotation.x = rotation.x;
         this.selected.rotation.y = rotation.y;
         this.selected.rotation.z = rotation.z;
+        // this.updatePosition(rotation);
       }
       this.emit("updated", this.selected);
     });
   }
+  updatePosition(rotation) {
+    this.selected.children.forEach((child) => {
+      child.rotation.x = rotation.x;
+      child.rotation.y = rotation.y;
+      child.rotation.z = rotation.z;
+    });
+  }
   deselect() {
-    if (this.selected) {        
-      this.selected.material.color.set( 13421772 );
+    if (this.selected) {
+      this.selected.children.forEach((child) => {
+        child.material.color.set( 13421772 );
+      });
+      // this.selected.material.color.set( 13421772 );
     }
     this.selected = null;
   }
   select(intersation) {
     this.selected = intersation;
-    this.selected.material.color.set( 0xff0000 );
+    this.selected.children.forEach((child) => {
+      child.material.color.set( 0xff0000 );
+    });
   }
   show() {
     this.rotation.parent.classList.add("visible");

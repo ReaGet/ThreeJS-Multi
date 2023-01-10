@@ -93,7 +93,6 @@ function loadModel({ id, url, location, rotation }) {
     model.position.set(location.x, location.y, location.z);
     model.rotation.set(rotation.x, rotation.y, rotation.z);
     model.userData.id = id;
-    console.log(model)
     scene.add(model);
   }, function (xhr) {
   }, function (error) {

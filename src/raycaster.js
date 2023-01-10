@@ -26,8 +26,8 @@ export default function Raycasting(camera, scene, callback) {
     clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(clickMouse, camera);
-    let found = raycaster.intersectObjects(scene.children);
-
-    callback(found[0]?.object, event);
+    let found = raycaster.intersectObjects(scene.children, true);
+    console.log(found[0]?.object.parent)
+    callback(found[0]?.object.parent, event);
   });
 }
