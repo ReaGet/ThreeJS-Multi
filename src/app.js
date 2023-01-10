@@ -6,9 +6,14 @@ import {
 
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
+import { debounce } from "./utils.js";
+import InputUI from "./inputs.js";
+
 let cameraPersp, currentCamera;
 let scene, renderer, orbit;
 let loader = null;
+let inputUI = null;
+let updateDataDebounced = null;
 
 init();
 // render();
@@ -38,46 +43,57 @@ async function init() {
   orbit = new OrbitControls(currentCamera, renderer.domElement);
   orbit.enableDamping = true;
   orbit.update();
+  
+  updateDataDebounced = debounce(updateData, 200);
+  inputUI = new InputUI(scene, currentCamera);
 
   loader = new GLTFLoader();
   await getModelsData((data) => {
     data.map(loadModel);
-    console.log(data);
   });
-  // let car = null;
-  
-  // loader.load(`./assets/car2/source/car.glb`, function (object) {
-  //   car = object.scene;
-  //   car.scale.set(200, 200, 200);
-  //   car.position.x = -290;
-  //   car.position.y = 0;
-  //   car.position.z = -320;
 
-  //   scene.add(car);
-  //   // render();
-  // }, function (xhr) {
-  // }, function (error) {
-  //     console.log("error")
-  // });
+  inputUI.on("updated", updateDataDebounced);
 
-  // orbit.addEventListener("change", render);
+  inputUI.on("render", render);
 
   window.addEventListener("resize", onWindowResize);
 }
 
-async function getModelsData(callback) {
-  await fetch("./php/request.php")
-    .then(response => response.json())
-    .then(callback);
+async function updateData(object) {
+  console.log(object)
+  const data = {
+    objectId: object.userData.id,
+    x: object.rotation.x,
+    y: object.rotation.y,
+    z: object.rotation.z,
+  }
+  const serialized = new URLSearchParams(data).toString();
+  try {
+    await fetch(`./php/request.php?${serialized}`);
+  } catch (err) {
+    console.error("Cannot update object: ", err);
+  }
 }
 
-function loadModel({ url, location }) {
+async function getModelsData(callback) {
+  try {  
+    await fetch("./php/request.php?get=1")
+    .then(response => response.json())
+    .then(callback);
+  } catch(err) {
+    console.error("Cannot get objects: ", err);
+  }
+}
+
+function loadModel({ id, url, location, rotation }) {
   loader.load(`.${url}`, function (object) {
     location = JSON.parse(location);
+    rotation = JSON.parse(rotation);
     let model = object.scene;
-    model.position.x = location.x;
-    model.position.y = location.y;
-    model.position.z = location.z;
+    model.position.set(location.x, location.y, location.z);
+    model.rotation.set(rotation.x, rotation.y, rotation.z);
+    model.userData.id = id;
+    console.log(model)
     scene.add(model);
   }, function (xhr) {
   }, function (error) {
