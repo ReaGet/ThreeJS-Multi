@@ -27,7 +27,17 @@ export default function Raycasting(camera, scene, callback) {
 
     raycaster.setFromCamera(clickMouse, camera);
     let found = raycaster.intersectObjects(scene.children, true);
-    console.log(found[0]?.object.parent)
-    callback(found[0]?.object.parent, event);
+    // console.log(parent(found[0]?.object))
+    callback(parent(found[0]?.object), event);
   });
+
+  function parent(object) {
+    if (!object) {
+      return null;
+    }
+    if (object.type === "Group") {
+      return object;
+    }
+    return parent(object.parent);
+  }
 }

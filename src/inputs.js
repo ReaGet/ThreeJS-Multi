@@ -1,4 +1,5 @@
 import Raycasting from "./raycaster.js";
+import * as THREE from "three";
 
 const template = `
   <div class="ui-wrapper">
@@ -73,18 +74,28 @@ export default class InputUI {
   }
   deselect() {
     if (this.selected) {
-      this.selected.children.forEach((child) => {
-        child.material.color.set( 13421772 );
+      this.selected.traverse((child) => {
+        if (child instanceof THREE.Object3D) {
+          if(child.material !== undefined) {
+            child.material.color.set( 13421772 );
+          }
+        }
       });
-      // this.selected.material.color.set( 13421772 );
     }
     this.selected = null;
   }
   select(intersation) {
     this.selected = intersation;
-    this.selected.children.forEach((child) => {
-      child.material.color.set( 0xff0000 );
+    this.selected.traverse((child) => {
+      if (child instanceof THREE.Object3D) {
+        if(child.material !== undefined) {
+          child.material.color.set( 0xff0000 );
+        }
+      }
     });
+    // this.selected.children.forEach((child) => {
+    //   child.material.color.set( 0xff0000 );
+    // });
   }
   show() {
     this.rotation.parent.classList.add("visible");

@@ -60,7 +60,6 @@ async function init() {
 }
 
 async function updateData(object) {
-  console.log(object)
   const data = {
     objectId: object.userData.id,
     x: object.rotation.x,
