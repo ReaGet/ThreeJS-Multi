@@ -51,25 +51,15 @@ export default class InputUI {
       if (event.target.tagName !== "INPUT") {
         return;
       }
-      const rotation = {
-        x: +this.rotation.xAxis.value * Math.PI / 180,
-        y: +this.rotation.yAxis.value * Math.PI / 180,
-        z: +this.rotation.zAxis.value * Math.PI / 180,
-      };
+      this.rotation.xAxis.value = this.handleValue(+this.rotation.xAxis.value);
+      this.rotation.yAxis.value = this.handleValue(+this.rotation.yAxis.value);
+      this.rotation.zAxis.value = this.handleValue(+this.rotation.zAxis.value);
       if (this.selected) {
-        this.selected.rotation.x = rotation.x;
-        this.selected.rotation.y = rotation.y;
-        this.selected.rotation.z = rotation.z;
-        // this.updatePosition(rotation);
+        this.selected.rotation.x = this.rotation.xAxis.value * Math.PI / 180;
+        this.selected.rotation.y = this.rotation.yAxis.value * Math.PI / 180;
+        this.selected.rotation.z = this.rotation.zAxis.value * Math.PI / 180;
       }
       this.emit("updated", this.selected);
-    });
-  }
-  updatePosition(rotation) {
-    this.selected.children.forEach((child) => {
-      child.rotation.x = rotation.x;
-      child.rotation.y = rotation.y;
-      child.rotation.z = rotation.z;
     });
   }
   deselect() {
@@ -93,9 +83,6 @@ export default class InputUI {
         }
       }
     });
-    // this.selected.children.forEach((child) => {
-    //   child.material.color.set( 0xff0000 );
-    // });
   }
   show() {
     this.rotation.parent.classList.add("visible");
@@ -107,6 +94,9 @@ export default class InputUI {
     this.rotation.xAxis.value = rotation.x * 180 / Math.PI;
     this.rotation.yAxis.value = rotation.y * 180 / Math.PI;
     this.rotation.zAxis.value = rotation.z * 180 / Math.PI;
+  }
+  handleValue(value) {
+    return (360 + (value % 360)) % 360;
   }
   on(listener, fn) {
     if (!this.listeners[listener]) {
